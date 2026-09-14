@@ -1,0 +1,15 @@
+defaults:
+  - gad
+
+dataset: enron
+batch_size: 1
+num_workers: 0
+num_nodes: 13533
+feat_size: 18
+
+unify_anomaly_types: true
+# attr_anomaly: true
+# struct_anomaly: false
+# com_anomaly: false
+
+

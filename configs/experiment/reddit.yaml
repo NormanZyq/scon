@@ -1,0 +1,56 @@
+# @package _global_
+
+defaults:
+  - override /data: reddit
+  - override /model: basic_gat_merged
+  - override /callbacks: no_early_stopping
+  - override /trainer: gpu
+  - override /logger: csv
+
+tags: ["reddit", "gat_backbone", "stable_tuned"]
+
+seed: 0
+
+trainer:
+  min_epochs: 50
+  max_epochs: 100
+
+model:
+  tau: 1.0
+  warm_epochs: 30
+  gate_mode: mono
+  attr_err_weight: 0.1
+  rho: 0.01
+  reg_lambda: 0.5
+  use_lp_loss: true
+  num_pos_samples: 0
+  neg_ratio: 1.0
+
+  optimizer:
+    _target_: torch.optim.Adam
+    _partial_: true
+    lr: 3e-3
+
+  warmup_encoder:
+    hidden_channels: 64
+    out_channels: 128
+    dropout: 0.2
+
+  encoder_gated:
+    num_layers: 2
+    dropout: 0.0
+    edge_dropout: 0.3
+    heads: 2
+    gate_mode: mono
+    use_layernorm: false
+    residual: false
+
+  feature_decoder:
+    mlp_hidden: 128
+    dropout: 0.3
+
+  str_decoder:
+    hid_dim: 128
+    num_layers: 1
+    dropout: 0.4
+    sigmoid_s: true

@@ -1,0 +1,77 @@
+# @package _global_
+# best:test/o_auc:65.38(±2.47)
+# to execute this experiment run:
+# python train.py experiment=example
+
+defaults:
+  - override /data: books
+  - override /model: basic_merged
+  - override /callbacks: no_early_stopping
+  - override /trainer: default
+  - override /logger: csv
+
+callbacks:
+  model_checkpoint:
+    save_last: false
+
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+
+tags: ["books"]
+
+seed: 0
+
+trainer:
+  # min_epochs: 50
+  max_epochs: 200
+  # gradient_clip_val: 0.5
+
+model:
+  tau: 1.0
+  gate_mode: mono
+  warm_epochs: 20
+  attr_err_weight:  0.84
+  rho: 0.02
+  reg_lambda: 0
+  use_lp_loss: true
+  num_pos_samples: 0
+  neg_ratio: 1.0
+  optimizer:
+    _target_: torch.optim.Adam
+    lr: 3e-3
+    # weight_decay: 1e-2
+
+  # ------
+  warmup_encoder:
+    hidden_channels: 64
+    out_channels: 32
+    dropout: 0.3
+
+  encoder_gated:
+    num_layers: 14
+    dropout: 0.1
+    edge_dropout: 0.6
+    gate_mode: mono
+    use_layernorm: false
+    residual: false
+
+  feature_decoder:
+    hidden_channels: ${model.warmup_encoder.out_channels}
+    mlp_hidden: 64
+    dropout: 0.2
+
+  str_decoder:
+    in_dim: ${model.encoder_gated.hidden_channels}
+    hid_dim: 64 # default=64
+    num_layers: 2
+    dropout: 0.4
+    sigmoid_s: true
+
+# logger:
+#   wandb:
+#     tags: ${tags}
+#     group: "mnist"
+#   aim:
+#     experiment: "mnist"
+
+# logger: csv

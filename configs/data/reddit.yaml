@@ -1,0 +1,13 @@
+defaults:
+  - gad
+dataset: reddit
+batch_size: 1
+num_workers: 0
+num_nodes: 10984
+feat_size: 64
+
+unify_anomaly_types: true
+# attr_anomaly: true
+# struct_anomaly: true
+# com_anomaly: false
+

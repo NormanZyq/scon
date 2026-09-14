@@ -1,0 +1,22 @@
+_target_: src.data.gad_datamodule.GADDataModule
+dataset: disney
+batch_size: 1
+num_workers: 0
+num_nodes: 124
+feat_size: 28
+
+# Must set unify_anomaly_types=true
+unify_anomaly_types: true
+# old params. Keep here for compatibility
+attr_anomaly: true
+struct_anomaly: true
+com_anomaly: false
+
+# we assume that:
+# y=1: attr anomaly
+# y=2: struct
+# y=3: combined / community anomaly
+#attr_anomaly: true
+#struct_anomaly: true
+#com_anomaly: true
+

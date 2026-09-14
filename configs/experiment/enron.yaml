@@ -1,0 +1,76 @@
+# @package _global_
+
+defaults:
+  - override /data: enron
+  - override /model: basic_merged
+  - override /callbacks: no_early_stopping
+  - override /trainer: gpu
+  - override /logger: csv
+
+# callbacks:
+#   model_checkpoint:
+#     save_last: false
+
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+
+tags: ["enron"]
+
+seed: 0
+
+trainer:
+  min_epochs: 50
+  max_epochs: 110
+  gradient_clip_val: 0.0
+
+model:
+  tau: 1.2
+  warm_epochs: 20
+  gate_mode: mono
+  attr_err_weight: 0.15
+  rho:  0.01
+  combine_o_method: weighted
+  reg_lambda: 0.54
+  use_lp_loss: true
+  num_pos_samples: 0
+  neg_ratio: 3
+
+  optimizer:
+    _target_: torch.optim.AdamW
+    _partial_: true
+    lr: 5e-3
+    weight_decay: 0
+
+  # ------
+  warmup_encoder:
+    hidden_channels: 64
+    out_channels: 32
+    dropout: 0.3
+  
+  encoder_gated:
+    num_layers: 5
+    dropout: 0.1
+    edge_dropout: 0.1
+    gate_mode: mono
+    use_layernorm: false
+    residual: false
+
+    
+  feature_decoder:
+    mlp_hidden: 64
+    dropout: 0.2
+
+  str_decoder:
+    hid_dim: 128 # default=64
+    num_layers: 2
+    dropout: 0.1
+    sigmoid_s: true
+
+# logger:
+#   wandb:
+#     tags: ${tags}
+#     group: "mnist"
+#   aim:
+#     experiment: "mnist"
+
+# logger: csv

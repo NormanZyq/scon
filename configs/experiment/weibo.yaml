@@ -1,0 +1,73 @@
+# @package _global_
+#best:test/o_auc:93.24(±0.16)
+# to execute this experiment run:
+# python train.py experiment=example
+
+defaults:
+  - override /data: weibo
+  - override /model: basic_merged
+  - override /callbacks: default
+  - override /trainer: gpu
+  - override /logger: csv
+
+
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+
+tags: ["weibo"]
+
+seed: 0
+
+trainer:
+  min_epochs: 50
+  max_epochs: 80
+
+model:
+  tau: 1.2
+  warm_epochs: 10
+  gate_mode: mono
+  attr_err_weight:  0.9
+  rho_attr:  0.1
+  rho_str:  0.3
+  combine_o_method: weighted    
+  reg_lambda: 0.02   # 0.44
+  use_lp_loss: true
+  num_pos_samples: 0
+  neg_ratio: 1.0
+
+  optimizer:
+    lr: 5e-3
+    weight_decay: 0
+
+  # ------
+  warmup_encoder:
+    hidden_channels: 128
+    out_channels: 32
+    dropout: 0   # 0.02
+
+  encoder_gated:
+    num_layers: 10
+    dropout: 0.3
+    edge_dropout: 0.2
+    gate_mode: mono
+    use_layernorm: false
+    residual: false
+
+  feature_decoder:
+    mlp_hidden: 128
+    dropout: 0.4
+
+  str_decoder:
+    hid_dim: 32 # default=64
+    num_layers: 1
+    dropout: 0.2
+    sigmoid_s: true
+
+# logger:
+#   wandb:
+#     tags: ${tags}
+#     group: "mnist"
+#   aim:
+#     experiment: "mnist"
+
+# logger: csv

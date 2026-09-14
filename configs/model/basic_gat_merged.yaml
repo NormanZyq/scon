@@ -1,0 +1,78 @@
+_target_: src.models.na_module.NodeAnomalyModule
+
+num_nodes: ${data.num_nodes}
+warm_epochs: 20
+tau: 1.0
+gate_mode: mono
+attr_err_weight: 0.7
+rho: 0.1
+reg_lambda: 0.5
+pos_weight_a: 0.5
+pos_weight_s: 0.5
+bce_s: false
+use_lp_loss: false
+num_pos_samples: 0
+neg_ratio: 1.0
+vis_emb: false
+vis_heatmap: false
+
+optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 1e-3
+  weight_decay: 0
+
+# set to null to disable lr scheduling by default (no val loop in current setup)
+scheduler: null
+
+# warmup_encoder:
+#   _target_: src.models.components.myconv.TwoLayerGNN
+#   in_channels: ${data.feat_size}
+#   hidden_channels: 64
+#   out_channels: ${model.warmup_encoder.hidden_channels}
+#   backbone: gcn
+#   heads: 1
+#   dropout: 0.3
+#   use_bn: false
+
+warmup_encoder:
+  _target_: src.models.components.myconv.MultiLayerGNN
+  in_channels: ${data.feat_size}
+  hidden_channels: 64
+  out_channels: ${model.warmup_encoder.hidden_channels}
+  num_layers: 2
+  backbone: gcn
+  heads: 1
+  dropout: 0.3
+  use_bn: false
+
+encoder_gated:
+  _target_: src.models.components.gated_conv.GatedGATEncoder
+  in_channels: ${data.feat_size}
+  hidden_channels: ${model.warmup_encoder.out_channels}
+  num_layers: 5
+  dropout: 0.3
+  edge_dropout: 0.5
+  gate_mode: ${model.gate_mode}
+  use_layernorm: false
+  residual: false
+  t: 0.5
+  k: 8.0
+
+feature_decoder:
+  _target_: src.models.components.decoder.FeatureDecoder
+  hidden_channels: ${model.warmup_encoder.out_channels}
+  out_channels: ${data.feat_size}
+  mlp_hidden: 64
+  dropout: 0.1
+
+str_decoder:
+  _target_: pygod.nn.decoder.DotProductDecoder
+  in_dim: ${model.encoder_gated.hidden_channels}
+  hid_dim: 64 # default=64
+  num_layers: 1
+  dropout: 0.1
+  sigmoid_s: true
+
+# compile model for faster training with pytorch 2.0
+compile: false
