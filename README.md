@@ -7,6 +7,12 @@ WIP.
 
 Currently we provide the running commands for quick run.
 
+After cloning the repository, create a directory `data` first by 
+
+```
+mkdir data
+```
+
 <!-- ## Architecture
 
 ## Requirements
